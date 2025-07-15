@@ -1,0 +1,4 @@
+﻿  main.cpp
+D:\Github\iocp_server\server\server\main.cpp(168,51): warning C4267: '=': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\Github\iocp_server\server\server\main.cpp(216,46): warning C4267: '=': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  server.vcxproj -> D:\Github\iocp_server\server\x64\Debug\server.exe
