@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS         // window에서 sprinf와 localtime 경고 비활성화
 #define _WINSOCK_DEPRECATED_NO_WARNINGS // 이전 버전의 Winsock 함수 사용 시 경고를 비활성화합니다.
 #pragma comment(lib, "ws2_32")          // Winsock2 라이브러리(ws2_32.lib)를 링크합니다.
 #include <winsock2.h>
@@ -116,7 +117,20 @@ int main(int argc, char* argv[]) {
         // 9. 비동기 데이터 수신(WSARecv) 요청
         // 클라이언트로부터 데이터를 받기 위해 비동기 수신 함수를 호출합니다.
         // 이 함수는 즉시 리턴되며, 데이터가 실제로 도착하면 IOCP 큐에 완료 통지가 쌓입니다.
-        receive(ptr);
+        string m_str;
+        char m_buf[BUFSIZE + 1];
+        time_t timer = time(NULL);
+        struct tm* t = localtime(&timer);
+        sprintf(m_buf, "%d년 %d월 %d일 %d시 %d분 %d초 %s", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec, inet_ntoa(clientaddr.sin_addr));
+        m_str = string(m_buf);
+
+        memcpy(ptr->buf, m_str.c_str(), m_str.size());
+        ptr->recvbytes = m_str.size();
+        ptr->sendbytes = 0;
+        ptr->sending = true;
+
+        send(ptr);
+        //receive(ptr);
     }
 
     WSACleanup();

@@ -1,4 +1,2 @@
-C:\Users\admin\Desktop\iocp_server-main\iocp_server-main\Client\Client\Client.cpp;C:\Users\admin\Desktop\iocp_server-main\iocp_server-main\Client\Client\x64\Debug\Client.obj
-C:\Users\admin\Desktop\iocp_server-main\iocp_server-main\Client\Client\ClientPacket.cpp;C:\Users\admin\Desktop\iocp_server-main\iocp_server-main\Client\Client\x64\Debug\ClientPacket.obj
-C:\Users\admin\Desktop\iocp_server-main\iocp_server-main\Client\Client\main.cpp;C:\Users\admin\Desktop\iocp_server-main\iocp_server-main\Client\Client\x64\Debug\main.obj
-C:\Users\admin\Desktop\iocp_server-main\iocp_server-main\Client\Client\Packet.cpp;C:\Users\admin\Desktop\iocp_server-main\iocp_server-main\Client\Client\x64\Debug\Packet.obj
+C:\Users\admin\Desktop\iocp_server-main\iocp_server-main\client\client\main.cpp;C:\Users\admin\Desktop\iocp_server-main\iocp_server-main\client\client\x64\Debug\main.obj
+C:\Users\admin\Desktop\iocp_server-main\iocp_server-main\client\client\Packet.cpp;C:\Users\admin\Desktop\iocp_server-main\iocp_server-main\client\client\x64\Debug\Packet.obj
