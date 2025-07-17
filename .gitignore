@@ -1,8 +1,6 @@
 # Created by https://www.toptal.com/developers/gitignore/api/c++,visualstudio
 # Edit at https://www.toptal.com/developers/gitignore?templates=c++,visualstudio
 
-server/.vs/server/v17/ipch/AutoPCH/a293eb304e3e9a99/MAIN.ipch
-
 ### C++ ###
 # Prerequisites
 *.d
@@ -437,3 +435,4 @@ FodyWeavers.xsd
 # Additional files built by Visual Studio
 
 # End of https://www.toptal.com/developers/gitignore/api/c++,visualstudio
+/server/.vs
