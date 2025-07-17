@@ -1,2 +1,3 @@
-C:\Users\admin\Desktop\iocp_server-main\iocp_server-main\client\client\main.cpp;C:\Users\admin\Desktop\iocp_server-main\iocp_server-main\client\client\x64\Debug\main.obj
-C:\Users\admin\Desktop\iocp_server-main\iocp_server-main\client\client\Packet.cpp;C:\Users\admin\Desktop\iocp_server-main\iocp_server-main\client\client\x64\Debug\Packet.obj
+D:\Github\iocp_server\client\client\ClientPacket.cpp;D:\Github\iocp_server\client\client\x64\Debug\ClientPacket.obj
+D:\Github\iocp_server\client\client\main.cpp;D:\Github\iocp_server\client\client\x64\Debug\main.obj
+D:\Github\iocp_server\client\client\Packet.cpp;D:\Github\iocp_server\client\client\x64\Debug\Packet.obj

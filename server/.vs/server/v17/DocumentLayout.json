@@ -38,8 +38,7 @@
               "RelativeToolTip": "server\\Packet.h",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2025-07-17T00:17:41.61Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-17T00:17:41.61Z"
             },
             {
               "$type": "Document",
@@ -51,8 +50,7 @@
               "RelativeToolTip": "server\\ServerPacket.h",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAACAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2025-07-17T00:12:30.294Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-17T00:12:30.294Z"
             },
             {
               "$type": "Document",
@@ -64,8 +62,7 @@
               "RelativeToolTip": "server\\ServerPacket.cpp",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2025-07-17T00:12:05.783Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-17T00:12:05.783Z"
             },
             {
               "$type": "Document",
@@ -75,7 +72,7 @@
               "RelativeDocumentMoniker": "server\\main.cpp",
               "ToolTip": "D:\\Github\\iocp_server\\server\\server\\main.cpp",
               "RelativeToolTip": "server\\main.cpp",
-              "ViewState": "AgIAAIcAAAAAAAAAAAAawJsAAAAPAAAAAAAAAA==",
+              "ViewState": "AgIAAIcAAAAAAAAAAAAawJoAAABQAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2025-07-15T09:43:36.76Z",
               "EditorCaption": ""
