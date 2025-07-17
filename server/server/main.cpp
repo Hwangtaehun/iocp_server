@@ -15,15 +15,6 @@
 
 using namespace std;
 
-//구조체로 이름, 아이피, 포트, socket정리
-struct Inf
-{
-    char name[20];
-    char ip[16];
-    u_short port;
-    SOCKET socket;
-};
-
 // 각 클라이언트의 상태 정보를 저장하기 위한 구조체
 struct SOCKETINFO {
     OVERLAPPED overlapped;      // 비동기 I/O 작업을 위한 OVERLAPPED 구조체. 반드시 첫 번째 멤버여야 함
@@ -34,6 +25,7 @@ struct SOCKETINFO {
     WSABUF wsabuf;              // 비동기 입출력 함수에서 사용할 버퍼 정보
     bool sending;               // 현재 데이터 송신 작업이 진행 중인지 여부를 나타내는 플래그
     queue<string> sendQueue;    // 송신할 메시지들을 저장하는 큐. 여러 메시지가 동시에 요청될 때 순서를 보장함
+    char name[20];              // 클라이언트 별명
 };
 
 vector<SOCKETINFO*> clients;    // 접속한 모든 클라이언트의 SOCKETINFO 포인터를 관리하는 벡터
@@ -130,7 +122,8 @@ int main(int argc, char* argv[]) {
         ptr->sendbytes = 0;
         ptr->sending = true;
 
-        send(ptr);
+        broadcast(ptr, ptr->buf, ptr->recvbytes);
+        //send(ptr);
         //receive(ptr);
     }
 
