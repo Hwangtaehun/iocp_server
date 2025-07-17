@@ -39,20 +39,14 @@ struct SOCKETINFO {
     queue<string> sendQueue;    // 송신할 메시지들을 저장하는 큐. 여러 메시지가 동시에 요청될 때 순서를 보장함
 };
 
-// 접속한 모든 클라이언트의 SOCKETINFO 포인터를 관리하는 벡터
-vector<SOCKETINFO*> clients;
-// 여러 스레드가 'clients' 벡터에 동시에 접근하는 것을 방지하기 위한 뮤텍스
-mutex clients_mutex;
+vector<SOCKETINFO*> clients;    // 접속한 모든 클라이언트의 SOCKETINFO 포인터를 관리하는 벡터
+mutex clients_mutex;            // 여러 스레드가 'clients' 벡터에 동시에 접근하는 것을 방지하기 위한 뮤텍스
 
-// Worker Thread 함수 프로토타입. IOCP에서 완료된 작업을 처리합니다.
 DWORD WINAPI WorkerThread(LPVOID arg);
-// 에러 처리 함수 프로토타입
-void err_quit(char* msg);
+void err_quit(char* msg);           
 void err_display(char* msg);
-// 비동기 데이터 송수신 함수 프로토타입
 bool send(SOCKETINFO* ptr);
 bool receive(SOCKETINFO* ptr);
-// 브로드캐스트 및 클라이언트 관리 함수 프로토타입
 void broadcast(SOCKETINFO* sender, const char* msg, int len);
 void remove_client(SOCKETINFO* ptr);
 
@@ -167,8 +161,14 @@ DWORD WINAPI WorkerThread(LPVOID arg) {
                 err_display("Client Disconnected");
                 closesocket(ptr->sock);
                 remove_client(ptr); // 클라이언트 목록에서 제거
-                delete ptr;         // 할당된 메모리 해제
+                ptr->sock = INVALID_SOCKET; // 재접근 방지
             }
+            continue;
+        }
+
+        // IOCP 이벤트에서 ptr이 NULL이거나 INVALID_SOCKET이면 삭제
+        if (ptr && ptr->sock == INVALID_SOCKET) {
+            delete ptr; // 할당된 메모리 해제
             continue;
         }
 
