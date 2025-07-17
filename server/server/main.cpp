@@ -79,6 +79,7 @@ int main(int argc, char* argv[]) {
     // 5. 클라이언트 접속 수락 루프
     while (1) {
         SOCKADDR_IN clientaddr;
+        ServerPacket pk = ServerPacket();
         int addrlen = sizeof(clientaddr);
         SOCKET client_sock = accept(listen_sock, (SOCKADDR*)&clientaddr, &addrlen);
         if (client_sock == INVALID_SOCKET) {
@@ -115,16 +116,19 @@ int main(int argc, char* argv[]) {
         time_t timer = time(NULL);
         struct tm* t = localtime(&timer);
         sprintf(m_buf, "%d년 %d월 %d일 %d시 %d분 %d초 %s", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec, inet_ntoa(clientaddr.sin_addr));
-        m_str = string(m_buf);
+        pk.SendAllConnect(m_buf);
+        pk.GetBuf(m_buf);
+        //m_str = string(m_buf);
 
-        memcpy(ptr->buf, m_str.c_str(), m_str.size());
-        ptr->recvbytes = m_str.size();
+        //memcpy(ptr->buf, m_str.c_str(), m_str.size());
+        //ptr->recvbytes = m_str.size();
+        memcpy(ptr->buf, m_buf, pk.GetSize());
+        ptr->recvbytes = pk.GetSize();
         ptr->sendbytes = 0;
         ptr->sending = true;
 
         send(ptr);
         broadcast(ptr, ptr->buf, ptr->recvbytes);
-        //receive(ptr);
     }
 
     WSACleanup();
@@ -137,7 +141,10 @@ DWORD WINAPI WorkerThread(LPVOID arg) {
     DWORD cbTransferred;              // I/O 작업으로 전송된 바이트 수
     SOCKET client_sock;               // I/O가 완료된 소켓 (Completion Key)
     SOCKETINFO* ptr;                  // I/O가 완료된 소켓의 상세 정보 구조체 (Overlapped 포인터)
+    char m_buf[BUFSIZE];
     int retval;
+    ServerPacket pk = ServerPacket();
+    bool first = TRUE;
 
     while (1) {
         // GetQueuedCompletionStatus: IOCP 큐에서 완료된 I/O 작업이 생길 때까지 대기합니다.
@@ -193,6 +200,20 @@ DWORD WINAPI WorkerThread(LPVOID arg) {
         else { // 수신 작업 완료
             ptr->recvbytes = cbTransferred;
             ptr->buf[cbTransferred] = '\0'; // 문자열 처리를 위해 NULL 종단 추가
+            memset(m_buf, 0, sizeof(m_buf));
+            memcpy(m_buf, ptr->buf, ptr->recvbytes);
+            pk.RecvMsg(m_buf);
+            pk.GetData(m_buf);
+
+            if (req_con == pk.GetType()) {
+                if (first) {
+                    first = !first;
+                    memcpy(ptr->name, pk.GetName(), sizeof(pk.GetName()));
+                }
+            }
+            else if (req_dis == pk.GetType()) {
+                //여기부터
+            }
 
             SOCKADDR_IN clientaddr;
             int addrlen = sizeof(clientaddr);

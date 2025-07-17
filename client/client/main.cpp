@@ -134,7 +134,7 @@ int main(int argc, char* argv[])
         }
 
         // 데이터 보내기
-        retval = send(sock, buf, strlen(buf), 0);
+        retval = send(sock, buf, pk.GetSize(), 0);
         if (retval == SOCKET_ERROR) {
             err_display("send()");
             break;
