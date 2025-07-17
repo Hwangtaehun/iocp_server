@@ -1,8 +1,0 @@
-﻿  ClientPacket.cpp
-  main.cpp
-D:\Github\iocp_server\client\client\main.cpp(76,21): warning C4267: '=': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-D:\Github\iocp_server\client\client\main.cpp(83,40): warning C4267: '인수': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-  Packet.cpp
-D:\Github\iocp_server\client\client\Packet.cpp(120,36): warning C4101: 'm_temp' :참조되지 않은 지역 변수입니다.
-  코드를 생성하고 있습니다...
-  Project1.vcxproj -> D:\Github\iocp_server\client\x64\Debug\client.exe
