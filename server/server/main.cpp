@@ -11,11 +11,21 @@
 #include <queue>
 #include <string>
 #include <algorithm>
+#include "ServerPacket.h"
 
 #define SERVERPORT 9000 // 서버가 사용할 포트 번호
 #define BUFSIZE    512  // 데이터 수신을 위한 버퍼 크기
 
 using namespace std;
+
+//구조체로 이름, 아이피, 포트, socket정리
+struct Inf
+{
+    char name[20];
+    char ip[16];
+    u_short port;
+    SOCKET socket;
+};
 
 // 각 클라이언트의 상태 정보를 저장하기 위한 구조체
 struct SOCKETINFO {
@@ -114,9 +124,9 @@ int main(int argc, char* argv[]) {
             clients.push_back(ptr);
         }
 
-        // 9. 비동기 데이터 수신(WSARecv) 요청
-        // 클라이언트로부터 데이터를 받기 위해 비동기 수신 함수를 호출합니다.
-        // 이 함수는 즉시 리턴되며, 데이터가 실제로 도착하면 IOCP 큐에 완료 통지가 쌓입니다.
+        // 9. 비동기 데이터 발신(WSASend) 요청
+        // 클라이언트에게 환영 메시지(시간과 IP 주소 포함)를 비동기적으로 송신을 시작합니다.
+        // 이 send 함수는 내부적으로 WSASend를 호출하며, 완료되면 IOCP를 통해 알림이 옵니다
         string m_str;
         char m_buf[BUFSIZE + 1];
         time_t timer = time(NULL);
@@ -139,10 +149,10 @@ int main(int argc, char* argv[]) {
 
 // Worker Thread: IOCP에서 완료된 I/O 작업을 처리하는 스레드
 DWORD WINAPI WorkerThread(LPVOID arg) {
-    HANDLE hcp = (HANDLE)arg; // main 스레드에서 전달받은 IOCP 핸들
-    DWORD cbTransferred;      // I/O 작업으로 전송된 바이트 수
-    SOCKET client_sock;       // I/O가 완료된 소켓 (Completion Key)
-    SOCKETINFO* ptr;          // I/O가 완료된 소켓의 상세 정보 구조체 (Overlapped 포인터)
+    HANDLE hcp = (HANDLE)arg;         // main 스레드에서 전달받은 IOCP 핸들
+    DWORD cbTransferred;              // I/O 작업으로 전송된 바이트 수
+    SOCKET client_sock;               // I/O가 완료된 소켓 (Completion Key)
+    SOCKETINFO* ptr;                  // I/O가 완료된 소켓의 상세 정보 구조체 (Overlapped 포인터)
     int retval;
 
     while (1) {

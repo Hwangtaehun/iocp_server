@@ -5,6 +5,18 @@
     {
       "AbsoluteMoniker": "D:0:0:{8358DA9C-7285-4EC4-B327-70184F63C943}|server\\server.vcxproj|D:\\Github\\iocp_server\\server\\server\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{8358DA9C-7285-4EC4-B327-70184F63C943}|server\\server.vcxproj|solutionrelative:server\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8358DA9C-7285-4EC4-B327-70184F63C943}|server\\server.vcxproj|D:\\Github\\iocp_server\\server\\server\\ServerPacket.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{8358DA9C-7285-4EC4-B327-70184F63C943}|server\\server.vcxproj|solutionrelative:server\\ServerPacket.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8358DA9C-7285-4EC4-B327-70184F63C943}|server\\server.vcxproj|D:\\Github\\iocp_server\\server\\server\\ServerPacket.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{8358DA9C-7285-4EC4-B327-70184F63C943}|server\\server.vcxproj|solutionrelative:server\\ServerPacket.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8358DA9C-7285-4EC4-B327-70184F63C943}|server\\server.vcxproj|D:\\Github\\iocp_server\\server\\server\\Packet.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{8358DA9C-7285-4EC4-B327-70184F63C943}|server\\server.vcxproj|solutionrelative:server\\Packet.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
   ],
   "DocumentGroupContainers": [
@@ -14,8 +26,47 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 3,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Packet.h",
+              "DocumentMoniker": "D:\\Github\\iocp_server\\server\\server\\Packet.h",
+              "RelativeDocumentMoniker": "server\\Packet.h",
+              "ToolTip": "D:\\Github\\iocp_server\\server\\server\\Packet.h",
+              "RelativeToolTip": "server\\Packet.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-07-17T00:17:41.61Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ServerPacket.h",
+              "DocumentMoniker": "D:\\Github\\iocp_server\\server\\server\\ServerPacket.h",
+              "RelativeDocumentMoniker": "server\\ServerPacket.h",
+              "ToolTip": "D:\\Github\\iocp_server\\server\\server\\ServerPacket.h",
+              "RelativeToolTip": "server\\ServerPacket.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAACAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-07-17T00:12:30.294Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ServerPacket.cpp",
+              "DocumentMoniker": "D:\\Github\\iocp_server\\server\\server\\ServerPacket.cpp",
+              "RelativeDocumentMoniker": "server\\ServerPacket.cpp",
+              "ToolTip": "D:\\Github\\iocp_server\\server\\server\\ServerPacket.cpp",
+              "RelativeToolTip": "server\\ServerPacket.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-07-17T00:12:05.783Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Document",
               "DocumentIndex": 0,
@@ -24,7 +75,7 @@
               "RelativeDocumentMoniker": "server\\main.cpp",
               "ToolTip": "D:\\Github\\iocp_server\\server\\server\\main.cpp",
               "RelativeToolTip": "server\\main.cpp",
-              "ViewState": "AgIAAAABAAAAAAAAAAAtwBoBAAABAAAAAAAAAA==",
+              "ViewState": "AgIAAIcAAAAAAAAAAAAawJsAAAAPAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2025-07-15T09:43:36.76Z",
               "EditorCaption": ""
