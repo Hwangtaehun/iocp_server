@@ -122,8 +122,8 @@ int main(int argc, char* argv[]) {
         ptr->sendbytes = 0;
         ptr->sending = true;
 
+        send(ptr);
         broadcast(ptr, ptr->buf, ptr->recvbytes);
-        //send(ptr);
         //receive(ptr);
     }
 
