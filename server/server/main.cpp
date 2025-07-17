@@ -3,13 +3,10 @@
 #pragma comment(lib, "ws2_32")          // Winsock2 라이브러리(ws2_32.lib)를 링크합니다.
 #include <winsock2.h>
 #include <windows.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <time.h>
 #include <vector>
 #include <mutex>
 #include <queue>
-#include <string>
 #include <algorithm>
 #include "ServerPacket.h"
 

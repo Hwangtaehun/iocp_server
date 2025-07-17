@@ -2,9 +2,8 @@
 #define _CRT_SECURE_NO_WARNINGS         // C 표준 함수(sprintf 등) 사용 시 발생하는 보안 경고를 비활성화합니다.
 #pragma comment(lib, "ws2_32")          // Winsock2 라이브러리(ws2_32.lib)를 링크합니다.
 #include <winsock2.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <time.h>
+#include "ClientPacket.h"
 
 #define SERVERIP   "127.0.0.1" // 접속할 서버의 IP 주소
 #define SERVERPORT 9000        // 접속할 서버의 포트 번호
@@ -17,9 +16,15 @@ DWORD __stdcall ThreadRecv(LPVOID arg);
 // 메인 함수: 프로그램의 시작점
 int main(int argc, char* argv[])
 {
+    char name[20];
+    printf("이름을 입력해주세요.");
+    scanf("%s", &name);
+    getchar();
+
     int retval;
     char msg[9];
     HANDLE hThread; // 수신 스레드의 핸들을 저장할 변수
+    ClientPacket pk = ClientPacket(name);
 
     // 1. 윈속 초기화
     WSADATA wsa;
@@ -58,7 +63,10 @@ int main(int argc, char* argv[])
         return 1;
     }
     buf[retval] = '\0';
+    pk.RecvMsg(buf);
+    pk.GetBuf(buf);
     printf("%s\n", buf); // 서버가 보낸 환영 메시지 출력
+    printf("M: 위치변경, C: 대화, X: 종료로 원하는 메뉴를 선택해주세요.\n");
 
     // 5. 수신용 스레드를 생성합니다. 이제부터 데이터 수신은 저 스레드가 전담합니다.
     // 세 번째 인자로 스레드가 실행할 함수(ThreadRecv)를,
