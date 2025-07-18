@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
-#define BUFSIZE 512
+#define BUFSIZE 512    // 데이터 송수신을 위한 버퍼 크기
 #define DATASIZE 506
 
 using namespace std;
