@@ -27,7 +27,6 @@ void ServerPacket::SChatMsg(char* name)
 {
 	char temp[DATASIZE] = {};
 
-	RecvMsg(buf);
 	sprintf(temp, "[%s]%s\0", name, data);
 	sprintf(data, "%s\0", temp);
 	size = (short)strlen(data) + 6;

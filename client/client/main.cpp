@@ -43,8 +43,6 @@ int main(int argc, char* argv[])
 
     if (retval == SOCKET_ERROR) err_quit("connect()");
 
-    //printf("[알림] 서버 접속 성공!\n");
-
     int len;
     char buf[BUFSIZE + 1]; // 데이터 통신에 사용할 변수
     HANDLE hThread; // 수신 스레드의 핸들을 저장할 변수
@@ -59,6 +57,9 @@ int main(int argc, char* argv[])
         WSACleanup();
         return 1;
     }
+    buf[retval] = '\0';
+    printf("%s\n", buf);
+
 
     pk.SetConnect(MyIP());
     pk.GetBuf(buf);
@@ -71,9 +72,6 @@ int main(int argc, char* argv[])
 
 
     buf[retval] = '\0';
-    pk.RecvMsg(buf);
-    pk.GetBuf(buf);
-    printf("%s\n", buf); // 서버가 보낸 환영 메시지 출력
     printf("M: 위치변경, C: 대화, X: 종료로 원하는 메뉴를 선택해주세요.\n");
 
     // 5. 수신용 스레드를 생성합니다. 이제부터 데이터 수신은 저 스레드가 전담합니다.
@@ -236,8 +234,7 @@ DWORD __stdcall ThreadRecv(LPVOID arg) {
         pk.GetData(buf);
 
         // 받은 데이터를 화면에 출력
-        buf[retval] = '\0'; // 수신한 데이터 끝에 NULL 문자를 추가하여 문자열로 만듦
-        printf("\n[받은 데이터] %s", buf);
+        printf("[받은 데이터] %s\n", buf);
     }
     return 0;
 }

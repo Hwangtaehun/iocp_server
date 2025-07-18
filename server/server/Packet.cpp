@@ -8,6 +8,9 @@ Packet::Packet()
 	m_x = 0.0f;
 	m_y = 0.0f;
 	m_z = 0.0f;
+	memset(buf, 0, sizeof(buf));
+	memset(name, 0, sizeof(name));
+	memset(data, 0, sizeof(data));
 }
 
 Packet::~Packet(){}
@@ -104,6 +107,7 @@ void Packet::RecvMsg(char* str) //비직렬화
 	memcpy(&type, str + sizeof(size), sizeof(type));
 	len = (int)size - sizeof(size) - sizeof(type) - sizeof(endmark);
 	memcpy(data, str + sizeof(size) + sizeof(type), len);
+	data[len] = '\0';
 	memcpy(&endmark, str + sizeof(size) + sizeof(type) + len, sizeof(endmark));
 	memcpy(buf, str, size);
 }

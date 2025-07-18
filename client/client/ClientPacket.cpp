@@ -88,7 +88,7 @@ void ClientPacket::SetConnect(char* ip)
 	size = (short)strlen(data) + 6;
 }
 
-void ClientPacket::SetMove(char* ip, char* msg)
+void ClientPacket::SetMove(char* ip, char* msg) //이부분 수정
 {
 	float x = 0, y = 0, z = 0;
 
