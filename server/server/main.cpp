@@ -1,6 +1,6 @@
-#define _CRT_SECURE_NO_WARNINGS         // window¿¡¼­ sprinf¿Í localtime °æ°í ºñÈ°¼ºÈ­
-#define _WINSOCK_DEPRECATED_NO_WARNINGS // ÀÌÀü ¹öÀüÀÇ Winsock ÇÔ¼ö »ç¿ë ½Ã °æ°í¸¦ ºñÈ°¼ºÈ­ÇÕ´Ï´Ù.
-#pragma comment(lib, "ws2_32")          // Winsock2 ¶óÀÌºê·¯¸®(ws2_32.lib)¸¦ ¸µÅ©ÇÕ´Ï´Ù.
+#define _CRT_SECURE_NO_WARNINGS         // windowì—ì„œ sprinfì™€ localtime ê²½ê³  ë¹„í™œì„±í™”
+#define _WINSOCK_DEPRECATED_NO_WARNINGS // ì´ì „ ë²„ì „ì˜ Winsock í•¨ìˆ˜ ì‚¬ìš© ì‹œ ê²½ê³ ë¥¼ ë¹„í™œì„±í™”í•©ë‹ˆë‹¤.
+#pragma comment(lib, "ws2_32")          // Winsock2 ë¼ì´ë¸ŒëŸ¬ë¦¬(ws2_32.lib)ë¥¼ ë§í¬í•©ë‹ˆë‹¤.
 #include <winsock2.h>
 #include <windows.h>
 #include <time.h>
@@ -10,29 +10,31 @@
 #include <algorithm>
 #include "ServerPacket.h"
 
-#define SERVERPORT 9000 // ¼­¹ö°¡ »ç¿ëÇÒ Æ÷Æ® ¹øÈ£
-#define BUFSIZE    512  // µ¥ÀÌÅÍ ¼ö½ÅÀ» À§ÇÑ ¹öÆÛ Å©±â
+#define SERVERPORT 9000 // ì„œë²„ê°€ ì‚¬ìš©í•  í¬íŠ¸ ë²ˆí˜¸
+#define BUFSIZE    512  // ë°ì´í„° ìˆ˜ì‹ ì„ ìœ„í•œ ë²„í¼ í¬ê¸°
 
 using namespace std;
 
-// °¢ Å¬¶óÀÌ¾ðÆ®ÀÇ »óÅÂ Á¤º¸¸¦ ÀúÀåÇÏ±â À§ÇÑ ±¸Á¶Ã¼
+// ê° í´ë¼ì´ì–¸íŠ¸ì˜ ìƒíƒœ ì •ë³´ë¥¼ ì €ìž¥í•˜ê¸° ìœ„í•œ êµ¬ì¡°ì²´
 struct SOCKETINFO {
-    OVERLAPPED overlapped;      // ºñµ¿±â I/O ÀÛ¾÷À» À§ÇÑ OVERLAPPED ±¸Á¶Ã¼. ¹Ýµå½Ã Ã¹ ¹øÂ° ¸â¹ö¿©¾ß ÇÔ
-    SOCKET sock;                // Å¬¶óÀÌ¾ðÆ®¿Í ¿¬°áµÈ ¼ÒÄÏ
-    char buf[BUFSIZE + 1];      // µ¥ÀÌÅÍ ¼ö½Å/¼Û½Å ¹öÆÛ
-    int recvbytes;              // ¼ö½ÅÇÑ µ¥ÀÌÅÍ ¹ÙÀÌÆ® ¼ö (¶Ç´Â ¼Û½ÅÇÒ ÃÑ ¹ÙÀÌÆ® ¼ö)
-    int sendbytes;              // ¼Û½ÅÇÑ µ¥ÀÌÅÍ ¹ÙÀÌÆ® ¼ö
-    WSABUF wsabuf;              // ºñµ¿±â ÀÔÃâ·Â ÇÔ¼ö¿¡¼­ »ç¿ëÇÒ ¹öÆÛ Á¤º¸
-    bool sending;               // ÇöÀç µ¥ÀÌÅÍ ¼Û½Å ÀÛ¾÷ÀÌ ÁøÇà ÁßÀÎÁö ¿©ºÎ¸¦ ³ªÅ¸³»´Â ÇÃ·¡±×
-    queue<string> sendQueue;    // ¼Û½ÅÇÒ ¸Þ½ÃÁöµéÀ» ÀúÀåÇÏ´Â Å¥. ¿©·¯ ¸Þ½ÃÁö°¡ µ¿½Ã¿¡ ¿äÃ»µÉ ¶§ ¼ø¼­¸¦ º¸ÀåÇÔ
-    char name[20];              // Å¬¶óÀÌ¾ðÆ® º°¸í
+    OVERLAPPED overlapped;      // ë¹„ë™ê¸° I/O ìž‘ì—…ì„ ìœ„í•œ OVERLAPPED êµ¬ì¡°ì²´. ë°˜ë“œì‹œ ì²« ë²ˆì§¸ ë©¤ë²„ì—¬ì•¼ í•¨
+    SOCKET sock;                // í´ë¼ì´ì–¸íŠ¸ì™€ ì—°ê²°ëœ ì†Œì¼“
+    char buf[BUFSIZE + 1];      // ë°ì´í„° ìˆ˜ì‹ /ì†¡ì‹  ë²„í¼
+    int recvbytes;              // ìˆ˜ì‹ í•œ ë°ì´í„° ë°”ì´íŠ¸ ìˆ˜ (ë˜ëŠ” ì†¡ì‹ í•  ì´ ë°”ì´íŠ¸ ìˆ˜)
+    int sendbytes;              // ì†¡ì‹ í•œ ë°ì´í„° ë°”ì´íŠ¸ ìˆ˜
+    WSABUF wsabuf;              // ë¹„ë™ê¸° ìž…ì¶œë ¥ í•¨ìˆ˜ì—ì„œ ì‚¬ìš©í•  ë²„í¼ ì •ë³´
+    bool sending;               // í˜„ìž¬ ë°ì´í„° ì†¡ì‹  ìž‘ì—…ì´ ì§„í–‰ ì¤‘ì¸ì§€ ì—¬ë¶€ë¥¼ ë‚˜íƒ€ë‚´ëŠ” í”Œëž˜ê·¸
+    queue<string> sendQueue;    // ì†¡ì‹ í•  ë©”ì‹œì§€ë“¤ì„ ì €ìž¥í•˜ëŠ” í. ì—¬ëŸ¬ ë©”ì‹œì§€ê°€ ë™ì‹œì— ìš”ì²­ë  ë•Œ ìˆœì„œë¥¼ ë³´ìž¥í•¨
+    char name[20];              // í´ë¼ì´ì–¸íŠ¸ ë³„ëª…
+    int curr_recv_len = 0;      // ì§€ê¸ˆê¹Œì§€ ë°›ì€ ê¸¸ì´
+    int expected_size = 0;      // ê¸°ëŒ€ íŒ¨í‚· ê¸¸ì´
 };
 
-vector<SOCKETINFO*> clients;    // Á¢¼ÓÇÑ ¸ðµç Å¬¶óÀÌ¾ðÆ®ÀÇ SOCKETINFO Æ÷ÀÎÅÍ¸¦ °ü¸®ÇÏ´Â º¤ÅÍ
-mutex clients_mutex;            // ¿©·¯ ½º·¹µå°¡ 'clients' º¤ÅÍ¿¡ µ¿½Ã¿¡ Á¢±ÙÇÏ´Â °ÍÀ» ¹æÁöÇÏ±â À§ÇÑ ¹ÂÅØ½º
+vector<SOCKETINFO*> clients;    // ì ‘ì†í•œ ëª¨ë“  í´ë¼ì´ì–¸íŠ¸ì˜ SOCKETINFO í¬ì¸í„°ë¥¼ ê´€ë¦¬í•˜ëŠ” ë²¡í„°
+mutex clients_mutex;            // ì—¬ëŸ¬ ìŠ¤ë ˆë“œê°€ 'clients' ë²¡í„°ì— ë™ì‹œì— ì ‘ê·¼í•˜ëŠ” ê²ƒì„ ë°©ì§€í•˜ê¸° ìœ„í•œ ë®¤í…ìŠ¤
 
 DWORD WINAPI WorkerThread(LPVOID arg);
-void err_quit(char* msg);           
+void err_quit(char* msg);
 void err_display(char* msg);
 bool send(SOCKETINFO* ptr);
 bool receive(SOCKETINFO* ptr);
@@ -40,33 +42,33 @@ void broadcast(SOCKETINFO* sender, const char* msg, int len);
 void remove_client(SOCKETINFO* ptr);
 
 int main(int argc, char* argv[]) {
-    // 1. Winsock ÃÊ±âÈ­
+    // 1. Winsock ì´ˆê¸°í™”
     WSADATA wsa;
     if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0) return 1;
 
-    // 2. IOCP »ý¼º
-    // CreateIoCompletionPort: »õ·Î¿î IOCP¸¦ »ý¼ºÇÏ°Å³ª ±âÁ¸ IOCP¿¡ ÇÚµéÀ» ¿¬°áÇÕ´Ï´Ù.
-    // Ã¹ ÀÎÀÚ°¡ INVALID_HANDLE_VALUEÀÌ¸é »õ·Î¿î IOCP¸¦ »ý¼ºÇÕ´Ï´Ù.
-    // ¸¶Áö¸· ÀÎÀÚ(NumberOfConcurrentThreads)¸¦ 0À¸·Î ¼³Á¤ÇÏ¸é ½Ã½ºÅÛÀÌ CPU ÄÚ¾î ¼ö¸¸Å­ÀÇ ½º·¹µå¸¦ µ¿½Ã¿¡ ½ÇÇàÇÏµµ·Ï Çã¿ëÇÕ´Ï´Ù.
+    // 2. IOCP ìƒì„±
+    // CreateIoCompletionPort: ìƒˆë¡œìš´ IOCPë¥¼ ìƒì„±í•˜ê±°ë‚˜ ê¸°ì¡´ IOCPì— í•¸ë“¤ì„ ì—°ê²°í•©ë‹ˆë‹¤.
+    // ì²« ì¸ìžê°€ INVALID_HANDLE_VALUEì´ë©´ ìƒˆë¡œìš´ IOCPë¥¼ ìƒì„±í•©ë‹ˆë‹¤.
+    // ë§ˆì§€ë§‰ ì¸ìž(NumberOfConcurrentThreads)ë¥¼ 0ìœ¼ë¡œ ì„¤ì •í•˜ë©´ ì‹œìŠ¤í…œì´ CPU ì½”ì–´ ìˆ˜ë§Œí¼ì˜ ìŠ¤ë ˆë“œë¥¼ ë™ì‹œì— ì‹¤í–‰í•˜ë„ë¡ í—ˆìš©í•©ë‹ˆë‹¤.
     HANDLE hcp = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0);
     if (hcp == NULL) return 1;
 
-    // 3. Worker Thread »ý¼º
+    // 3. Worker Thread ìƒì„±
     SYSTEM_INFO si;
-    GetSystemInfo(&si); // ½Ã½ºÅÛ Á¤º¸(CPU ÄÚ¾î ¼ö µî)¸¦ ¾ò½À´Ï´Ù.
-    // ÀÏ¹ÝÀûÀ¸·Î CPU ÄÚ¾î ¼öÀÇ 2¹è¸¸Å­ Worker Thread¸¦ »ý¼ºÇÏ´Â °ÍÀÌ ÁÁÀº ¼º´ÉÀ» º¸ÀÔ´Ï´Ù.
+    GetSystemInfo(&si); // ì‹œìŠ¤í…œ ì •ë³´(CPU ì½”ì–´ ìˆ˜ ë“±)ë¥¼ ì–»ìŠµë‹ˆë‹¤.
+    // ì¼ë°˜ì ìœ¼ë¡œ CPU ì½”ì–´ ìˆ˜ì˜ 2ë°°ë§Œí¼ Worker Threadë¥¼ ìƒì„±í•˜ëŠ” ê²ƒì´ ì¢‹ì€ ì„±ëŠ¥ì„ ë³´ìž…ë‹ˆë‹¤.
     for (int i = 0; i < (int)si.dwNumberOfProcessors * 2; i++) {
         HANDLE hThread = CreateThread(NULL, 0, WorkerThread, hcp, 0, NULL);
-        CloseHandle(hThread); // ½º·¹µå ÇÚµéÀº ´õ ÀÌ»ó ÇÊ¿ä ¾øÀ¸¹Ç·Î ¹Ù·Î ´Ý½À´Ï´Ù. (½º·¹µå ÀÚÃ¼´Â °è¼Ó ½ÇÇàµÊ)
+        CloseHandle(hThread); // ìŠ¤ë ˆë“œ í•¸ë“¤ì€ ë” ì´ìƒ í•„ìš” ì—†ìœ¼ë¯€ë¡œ ë°”ë¡œ ë‹«ìŠµë‹ˆë‹¤. (ìŠ¤ë ˆë“œ ìžì²´ëŠ” ê³„ì† ì‹¤í–‰ë¨)
     }
 
-    // 4. ¸®½¼ ¼ÒÄÏ »ý¼º ¹× ¼³Á¤
+    // 4. ë¦¬ìŠ¨ ì†Œì¼“ ìƒì„± ë° ì„¤ì •
     SOCKET listen_sock = socket(AF_INET, SOCK_STREAM, 0);
     if (listen_sock == INVALID_SOCKET) err_quit("socket()");
 
     SOCKADDR_IN serveraddr = { 0 };
     serveraddr.sin_family = AF_INET;
-    serveraddr.sin_addr.s_addr = htonl(INADDR_ANY); // ¸ðµç IP ÁÖ¼Ò·ÎºÎÅÍÀÇ Á¢¼ÓÀ» Çã¿ëÇÕ´Ï´Ù.
+    serveraddr.sin_addr.s_addr = htonl(INADDR_ANY); // ëª¨ë“  IP ì£¼ì†Œë¡œë¶€í„°ì˜ ì ‘ì†ì„ í—ˆìš©í•©ë‹ˆë‹¤.
     serveraddr.sin_port = htons(SERVERPORT);
     if (bind(listen_sock, (SOCKADDR*)&serveraddr, sizeof(serveraddr)) == SOCKET_ERROR)
         err_quit("bind()");
@@ -76,7 +78,7 @@ int main(int argc, char* argv[]) {
 
     // printf("[Chat Server] Listening on port %d...\n", SERVERPORT);
 
-    // 5. Å¬¶óÀÌ¾ðÆ® Á¢¼Ó ¼ö¶ô ·çÇÁ
+    // 5. í´ë¼ì´ì–¸íŠ¸ ì ‘ì† ìˆ˜ë½ ë£¨í”„
     while (1) {
         SOCKADDR_IN clientaddr;
         ServerPacket pk = ServerPacket();
@@ -86,42 +88,39 @@ int main(int argc, char* argv[]) {
             err_display("accept()");
             continue;
         }
-        printf("Å¬¶óÀÌ¾ðÆ® Á¢¼Ó: IP ÁÖ¼Ò=%s, Æ÷Æ® ¹øÈ£=%d\n", inet_ntoa(clientaddr.sin_addr), ntohs(clientaddr.sin_port));
+        printf("í´ë¼ì´ì–¸íŠ¸ ì ‘ì†: IP ì£¼ì†Œ=%s, í¬íŠ¸ ë²ˆí˜¸=%d\n", inet_ntoa(clientaddr.sin_addr), ntohs(clientaddr.sin_port));
 
-        // 6. Å¬¶óÀÌ¾ðÆ® ¼ÒÄÏÀ» IOCP¿¡ ¿¬°á
-        // »ý¼ºµÈ Å¬¶óÀÌ¾ðÆ® ¼ÒÄÏ(client_sock)À» ±âÁ¸ IOCP(hcp)¿Í ¿¬°áÇÕ´Ï´Ù.
-        // ¼¼ ¹øÂ° ÀÎÀÚ(CompletionKey)·Î ¼ÒÄÏ ÇÚµéÀ» Àü´ÞÇÏ¿©, ¾î¶² ¼ÒÄÏ¿¡¼­ I/O°¡ ¿Ï·áµÇ¾ú´ÂÁö ½Äº°ÇÒ ¼ö ÀÖ°Ô ÇÕ´Ï´Ù.
+        // 6. í´ë¼ì´ì–¸íŠ¸ ì†Œì¼“ì„ IOCPì— ì—°ê²°
+        // ìƒì„±ëœ í´ë¼ì´ì–¸íŠ¸ ì†Œì¼“(client_sock)ì„ ê¸°ì¡´ IOCP(hcp)ì™€ ì—°ê²°í•©ë‹ˆë‹¤.
+        // ì„¸ ë²ˆì§¸ ì¸ìž(CompletionKey)ë¡œ ì†Œì¼“ í•¸ë“¤ì„ ì „ë‹¬í•˜ì—¬, ì–´ë–¤ ì†Œì¼“ì—ì„œ I/Oê°€ ì™„ë£Œë˜ì—ˆëŠ”ì§€ ì‹ë³„í•  ìˆ˜ ìžˆê²Œ í•©ë‹ˆë‹¤.
         CreateIoCompletionPort((HANDLE)client_sock, hcp, (ULONG_PTR)client_sock, 0);
 
-        // 7. Å¬¶óÀÌ¾ðÆ® Á¤º¸ ±¸Á¶Ã¼(SOCKETINFO) »ý¼º ¹× ÃÊ±âÈ­
+        // 7. í´ë¼ì´ì–¸íŠ¸ ì •ë³´ êµ¬ì¡°ì²´(SOCKETINFO) ìƒì„± ë° ì´ˆê¸°í™”
         SOCKETINFO* ptr = new SOCKETINFO;
         ZeroMemory(&ptr->overlapped, sizeof(ptr->overlapped));
         ptr->sock = client_sock;
         ptr->recvbytes = ptr->sendbytes = 0;
         ptr->wsabuf.buf = ptr->buf;
         ptr->wsabuf.len = BUFSIZE;
-        ptr->sending = false; // ÃÊ±â »óÅÂ´Â ¼Û½Å ÁßÀÌ ¾Æ´Ô
+        ptr->sending = false; // ì´ˆê¸° ìƒíƒœëŠ” ì†¡ì‹  ì¤‘ì´ ì•„ë‹˜
 
-        // 8. Å¬¶óÀÌ¾ðÆ® ¸ñ·Ï¿¡ Ãß°¡ (Thread-safe)
+        // 8. í´ë¼ì´ì–¸íŠ¸ ëª©ë¡ì— ì¶”ê°€ (Thread-safe)
         {
-            lock_guard<mutex> lock(clients_mutex); // ¹ÂÅØ½º¸¦ ÀÌ¿ëÇØ 'clients' º¤ÅÍ Á¢±ÙÀ» º¸È£ÇÕ´Ï´Ù.
+            lock_guard<mutex> lock(clients_mutex); // ë®¤í…ìŠ¤ë¥¼ ì´ìš©í•´ 'clients' ë²¡í„° ì ‘ê·¼ì„ ë³´í˜¸í•©ë‹ˆë‹¤.
             clients.push_back(ptr);
         }
 
-        // 9. ºñµ¿±â µ¥ÀÌÅÍ ¹ß½Å(WSASend) ¿äÃ»
-        // Å¬¶óÀÌ¾ðÆ®¿¡°Ô È¯¿µ ¸Þ½ÃÁö(½Ã°£°ú IP ÁÖ¼Ò Æ÷ÇÔ)¸¦ ºñµ¿±âÀûÀ¸·Î ¼Û½ÅÀ» ½ÃÀÛÇÕ´Ï´Ù.
-        // ÀÌ send ÇÔ¼ö´Â ³»ºÎÀûÀ¸·Î WSASend¸¦ È£ÃâÇÏ¸ç, ¿Ï·áµÇ¸é IOCP¸¦ ÅëÇØ ¾Ë¸²ÀÌ ¿É´Ï´Ù
-        string m_str;
+        // 9. ë¹„ë™ê¸° ë°ì´í„° ë°œì‹ (WSASend) ìš”ì²­
+        // í´ë¼ì´ì–¸íŠ¸ì—ê²Œ í™˜ì˜ ë©”ì‹œì§€(ì‹œê°„ê³¼ IP ì£¼ì†Œ í¬í•¨)ë¥¼ ë¹„ë™ê¸°ì ìœ¼ë¡œ ì†¡ì‹ ì„ ì‹œìž‘í•©ë‹ˆë‹¤.
+        // ì´ send í•¨ìˆ˜ëŠ” ë‚´ë¶€ì ìœ¼ë¡œ WSASendë¥¼ í˜¸ì¶œí•˜ë©°, ì™„ë£Œë˜ë©´ IOCPë¥¼ í†µí•´ ì•Œë¦¼ì´ ì˜µë‹ˆë‹¤
+        //string m_str;
         char m_buf[BUFSIZE + 1];
         time_t timer = time(NULL);
         struct tm* t = localtime(&timer);
-        sprintf(m_buf, "%d³â %d¿ù %dÀÏ %d½Ã %dºÐ %dÃÊ %s", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec, inet_ntoa(clientaddr.sin_addr));
+        sprintf(m_buf, "%dë…„ %dì›” %dì¼ %dì‹œ %dë¶„ %dì´ˆ %s", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec, inet_ntoa(clientaddr.sin_addr));
         pk.SendAllConnect(m_buf);
         pk.GetBuf(m_buf);
-        //m_str = string(m_buf);
-
-        //memcpy(ptr->buf, m_str.c_str(), m_str.size());
-        //ptr->recvbytes = m_str.size();
+        
         memcpy(ptr->buf, m_buf, pk.GetSize());
         ptr->recvbytes = pk.GetSize();
         ptr->sendbytes = 0;
@@ -135,154 +134,167 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 
-// Worker Thread: IOCP¿¡¼­ ¿Ï·áµÈ I/O ÀÛ¾÷À» Ã³¸®ÇÏ´Â ½º·¹µå
+// Worker Thread: IOCPì—ì„œ ì™„ë£Œëœ I/O ìž‘ì—…ì„ ì²˜ë¦¬í•˜ëŠ” ìŠ¤ë ˆë“œ
 DWORD WINAPI WorkerThread(LPVOID arg) {
-    HANDLE hcp = (HANDLE)arg;         // main ½º·¹µå¿¡¼­ Àü´Þ¹ÞÀº IOCP ÇÚµé
-    DWORD cbTransferred;              // I/O ÀÛ¾÷À¸·Î Àü¼ÛµÈ ¹ÙÀÌÆ® ¼ö
-    SOCKET client_sock;               // I/O°¡ ¿Ï·áµÈ ¼ÒÄÏ (Completion Key)
-    SOCKETINFO* ptr;                  // I/O°¡ ¿Ï·áµÈ ¼ÒÄÏÀÇ »ó¼¼ Á¤º¸ ±¸Á¶Ã¼ (Overlapped Æ÷ÀÎÅÍ)
-    char m_buf[BUFSIZE];
+    HANDLE hcp = (HANDLE)arg;         // main ìŠ¤ë ˆë“œì—ì„œ ì „ë‹¬ë°›ì€ IOCP í•¸ë“¤
+    DWORD cbTransferred;              // I/O ìž‘ì—…ìœ¼ë¡œ ì „ì†¡ëœ ë°”ì´íŠ¸ ìˆ˜
+    SOCKET client_sock;               // I/Oê°€ ì™„ë£Œëœ ì†Œì¼“ (Completion Key)
+    SOCKETINFO* ptr;                  // I/Oê°€ ì™„ë£Œëœ ì†Œì¼“ì˜ ìƒì„¸ ì •ë³´ êµ¬ì¡°ì²´ (Overlapped í¬ì¸í„°)
     int retval;
+
     ServerPacket pk = ServerPacket();
-    bool first = TRUE;
 
     while (1) {
-        // GetQueuedCompletionStatus: IOCP Å¥¿¡¼­ ¿Ï·áµÈ I/O ÀÛ¾÷ÀÌ »ý±æ ¶§±îÁö ´ë±âÇÕ´Ï´Ù.
-        // I/O°¡ ¿Ï·áµÇ¸é, ÇØ´ç ÀÛ¾÷¿¡ ´ëÇÑ Á¤º¸(Àü¼ÛµÈ ¹ÙÀÌÆ®, CompletionKey, OVERLAPPED Æ÷ÀÎÅÍ)¸¦ ¹ÝÈ¯ÇÕ´Ï´Ù.
+        // GetQueuedCompletionStatus: IOCP íì—ì„œ ì™„ë£Œëœ I/O ìž‘ì—…ì´ ìƒê¸¸ ë•Œê¹Œì§€ ëŒ€ê¸°í•©ë‹ˆë‹¤.
+        // I/Oê°€ ì™„ë£Œë˜ë©´, í•´ë‹¹ ìž‘ì—…ì— ëŒ€í•œ ì •ë³´(ì „ì†¡ëœ ë°”ì´íŠ¸, CompletionKey, OVERLAPPED í¬ì¸í„°)ë¥¼ ë°˜í™˜í•©ë‹ˆë‹¤.
         retval = GetQueuedCompletionStatus(hcp, &cbTransferred, (PULONG_PTR)&client_sock, (LPOVERLAPPED*)&ptr, INFINITE);
 
-        // Å¬¶óÀÌ¾ðÆ® ¿¬°á Á¾·á Ã³¸®
+        // í´ë¼ì´ì–¸íŠ¸ ì—°ê²° ì¢…ë£Œ ì²˜ë¦¬
         if (retval == 0 || cbTransferred == 0) {
-            // GetQueuedCompletionStatus°¡ 0À» ¹ÝÈ¯ÇÏ°Å³ª Àü¼ÛµÈ ¹ÙÀÌÆ®°¡ 0ÀÌ¸é Å¬¶óÀÌ¾ðÆ® ¿¬°áÀÌ ²÷¾îÁø °ÍÀÔ´Ï´Ù.
-            if (ptr != NULL) { // ptrÀÌ NULLÀÎ °æ¿ìµµ ÀÖÀ» ¼ö ÀÖÀ¸¹Ç·Î È®ÀÎ
+            // GetQueuedCompletionStatusê°€ 0ì„ ë°˜í™˜í•˜ê±°ë‚˜ ì „ì†¡ëœ ë°”ì´íŠ¸ê°€ 0ì´ë©´ í´ë¼ì´ì–¸íŠ¸ ì—°ê²°ì´ ëŠì–´ì§„ ê²ƒìž…ë‹ˆë‹¤.
+            if (ptr != NULL) { // ptrì´ NULLì¸ ê²½ìš°ë„ ìžˆì„ ìˆ˜ ìžˆìœ¼ë¯€ë¡œ í™•ì¸
                 err_display("Client Disconnected");
                 closesocket(ptr->sock);
-                remove_client(ptr); // Å¬¶óÀÌ¾ðÆ® ¸ñ·Ï¿¡¼­ Á¦°Å
-                ptr->sock = INVALID_SOCKET; // ÀçÁ¢±Ù ¹æÁö
+                remove_client(ptr); // í´ë¼ì´ì–¸íŠ¸ ëª©ë¡ì—ì„œ ì œê±°
+                ptr->sock = INVALID_SOCKET; // ìž¬ì ‘ê·¼ ë°©ì§€
             }
             continue;
         }
 
-        // IOCP ÀÌº¥Æ®¿¡¼­ ptrÀÌ NULLÀÌ°Å³ª INVALID_SOCKETÀÌ¸é »èÁ¦
+        // IOCP ì´ë²¤íŠ¸ì—ì„œ ptrì´ NULLì´ê±°ë‚˜ INVALID_SOCKETì´ë©´ ì‚­ì œ
         if (ptr && ptr->sock == INVALID_SOCKET) {
-            delete ptr; // ÇÒ´çµÈ ¸Þ¸ð¸® ÇØÁ¦
+            delete ptr; // í• ë‹¹ëœ ë©”ëª¨ë¦¬ í•´ì œ
             continue;
         }
 
-        // I/O ÀÛ¾÷ÀÇ Á¾·ù(¼Û½Å/¼ö½Å)¿¡ µû¶ó Ã³¸® ºÐ±â
-        if (ptr->sending) { // ¼Û½Å ÀÛ¾÷ ¿Ï·á
+        // I/O ìž‘ì—…ì˜ ì¢…ë¥˜(ì†¡ì‹ /ìˆ˜ì‹ )ì— ë”°ë¼ ì²˜ë¦¬ ë¶„ê¸°
+        if (ptr->sending) { // ì†¡ì‹  ìž‘ì—… ì™„ë£Œ
             ptr->sendbytes += cbTransferred;
-            // º¸³¾ µ¥ÀÌÅÍ°¡ ¾ÆÁ÷ ³²¾ÆÀÖ´Â °æ¿ì (µ¥ÀÌÅÍ°¡ ÇÑ ¹ø¿¡ ´Ù º¸³»ÁöÁö ¾ÊÀº °æ¿ì)
+            // ë³´ë‚¼ ë°ì´í„°ê°€ ì•„ì§ ë‚¨ì•„ìžˆëŠ” ê²½ìš° (ë°ì´í„°ê°€ í•œ ë²ˆì— ë‹¤ ë³´ë‚´ì§€ì§€ ì•Šì€ ê²½ìš°)
             if (ptr->sendbytes < ptr->recvbytes) {
-                send(ptr); // ³²Àº µ¥ÀÌÅÍ¸¦ ¸¶Àú º¸³À´Ï´Ù.
+                send(ptr); // ë‚¨ì€ ë°ì´í„°ë¥¼ ë§ˆì € ë³´ëƒ…ë‹ˆë‹¤.
             }
             else {
-                // ÇöÀç ¸Þ½ÃÁö ¼Û½Å ¿Ï·á
-                ptr->sending = false; // ¼Û½Å »óÅÂ ÇÃ·¡±×¸¦ ³»¸³´Ï´Ù.
+                // í˜„ìž¬ ë©”ì‹œì§€ ì†¡ì‹  ì™„ë£Œ
+                ptr->sending = false; // ì†¡ì‹  ìƒíƒœ í”Œëž˜ê·¸ë¥¼ ë‚´ë¦½ë‹ˆë‹¤.
 
-                // ¼Û½Å ´ë±â¿­(sendQueue)¿¡ ´Ù¸¥ ¸Þ½ÃÁö°¡ ÀÖ´ÂÁö È®ÀÎ
+                // ì†¡ì‹  ëŒ€ê¸°ì—´(sendQueue)ì— ë‹¤ë¥¸ ë©”ì‹œì§€ê°€ ìžˆëŠ”ì§€ í™•ì¸
                 if (!ptr->sendQueue.empty()) {
                     string next_msg = ptr->sendQueue.front();
                     ptr->sendQueue.pop();
 
                     memcpy(ptr->buf, next_msg.c_str(), next_msg.size());
-                    ptr->recvbytes = next_msg.size(); // º¸³¾ ¹ÙÀÌÆ® ¼ö ¼³Á¤
-                    ptr->sendbytes = 0; // º¸³½ ¹ÙÀÌÆ® ¼ö ÃÊ±âÈ­
-                    ptr->sending = true; // ´Ù½Ã ¼Û½Å »óÅÂ·Î ÀüÈ¯
-                    send(ptr); // ´ÙÀ½ ¸Þ½ÃÁö ¼Û½Å ½ÃÀÛ
+                    ptr->recvbytes = next_msg.size(); // ë³´ë‚¼ ë°”ì´íŠ¸ ìˆ˜ ì„¤ì •
+                    ptr->sendbytes = 0; // ë³´ë‚¸ ë°”ì´íŠ¸ ìˆ˜ ì´ˆê¸°í™”
+                    ptr->sending = true; // ë‹¤ì‹œ ì†¡ì‹  ìƒíƒœë¡œ ì „í™˜
+                    send(ptr); // ë‹¤ìŒ ë©”ì‹œì§€ ì†¡ì‹  ì‹œìž‘
                 }
                 else {
-                    // º¸³¾ ¸Þ½ÃÁö°¡ ´õ ¾øÀ¸¸é, ´Ù½Ã µ¥ÀÌÅÍ ¼ö½Å ´ë±â »óÅÂ·Î ÀüÈ¯ÇÕ´Ï´Ù.
+                    // ë³´ë‚¼ ë©”ì‹œì§€ê°€ ë” ì—†ìœ¼ë©´, ë‹¤ì‹œ ë°ì´í„° ìˆ˜ì‹  ëŒ€ê¸° ìƒíƒœë¡œ ì „í™˜í•©ë‹ˆë‹¤.
                     receive(ptr);
                 }
             }
         }
-        else { // ¼ö½Å ÀÛ¾÷ ¿Ï·á
+        else { // ìˆ˜ì‹  ìž‘ì—… ì™„ë£Œ
             ptr->recvbytes = cbTransferred;
-            ptr->buf[cbTransferred] = '\0'; // ¹®ÀÚ¿­ Ã³¸®¸¦ À§ÇØ NULL Á¾´Ü Ãß°¡
-            memset(m_buf, 0, sizeof(m_buf));
-            memcpy(m_buf, ptr->buf, ptr->recvbytes);
-            pk.RecvMsg(m_buf);
-            pk.GetData(m_buf);
-
-            if (req_con == pk.GetType()) {
-                if (first) {
-                    first = !first;
-                    memcpy(ptr->name, pk.GetName(), sizeof(pk.GetName()));
-                }
-            }
-            else if (req_dis == pk.GetType()) {
-                //¿©±âºÎÅÍ
-            }
+            ptr->buf[cbTransferred] = '\0'; // ë¬¸ìžì—´ ì²˜ë¦¬ë¥¼ ìœ„í•´ NULL ì¢…ë‹¨ ì¶”ê°€
 
             SOCKADDR_IN clientaddr;
             int addrlen = sizeof(clientaddr);
             getpeername(ptr->sock, (SOCKADDR*)&clientaddr, &addrlen);
-            printf("[Message from %s:%d] %s\n", inet_ntoa(clientaddr.sin_addr), ntohs(clientaddr.sin_port), ptr->buf);
 
-            // ¹ÞÀº ¸Þ½ÃÁö¸¦ ´Ù¸¥ ¸ðµç Å¬¶óÀÌ¾ðÆ®¿¡°Ô Àü¼Û (ºê·ÎµåÄ³½ºÆ®)
-            broadcast(ptr, ptr->buf, cbTransferred);
+            char m_buf[BUFSIZE] = { 0 };
+            memcpy(m_buf, ptr->buf, ptr->recvbytes);
+            m_buf[ptr->recvbytes] = '\0';
+            pk.RecvMsg(m_buf);
+            pk.GetData(m_buf);
 
-            // ´ÙÀ½ ¸Þ½ÃÁö¸¦ ¹Þ±â À§ÇØ ´Ù½Ã ºñµ¿±â ¼ö½ÅÀ» ¿äÃ»ÇÕ´Ï´Ù.
-            // ÀÌ°ÍÀÌ ºñµ¿±â ¸ðµ¨ÀÇ ÇÙ½ÉÀÔ´Ï´Ù. ÇÏ³ªÀÇ ÀÛ¾÷ÀÌ ³¡³ª¸é ´ÙÀ½ ÀÛ¾÷À» ¹Ù·Î ´Ù½Ã°Ì´Ï´Ù.
+            printf("[Message from %s:%d] %s\n", inet_ntoa(clientaddr.sin_addr), ntohs(clientaddr.sin_port), m_buf);
+
+            if (req_con == pk.GetType()) {
+                printf("name=%s\n", pk.GetName());
+                memcpy(ptr->name, pk.GetName(), sizeof(pk.GetName()));
+                pk.SendAllConnect(m_buf);
+            }
+            else if (req_dis == pk.GetType()) {
+                time_t timer = time(NULL);
+                struct tm* t = localtime(&timer);
+                sprintf(m_buf, "%dë…„ %dì›” %dì¼ %dì‹œ %dë¶„ %dì´ˆ %s:%d", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec, inet_ntoa(clientaddr.sin_addr), ntohs(clientaddr.sin_port));
+                pk.SetClose(m_buf);
+            }
+            else if (req_move == pk.GetType()) {
+                pk.SendAllMove();
+            }
+            else if (chat_string == pk.GetType()) {
+                pk.SChatMsg(ptr->name);
+            }
+
+            pk.GetBuf(m_buf);
+
+            // ë°›ì€ ë©”ì‹œì§€ë¥¼ ë‹¤ë¥¸ ëª¨ë“  í´ë¼ì´ì–¸íŠ¸ì—ê²Œ ì „ì†¡ (ë¸Œë¡œë“œìºìŠ¤íŠ¸)
+            //broadcast(ptr, ptr->buf, cbTransferred);
+            broadcast(ptr, m_buf, pk.GetSize());
+
+            // ë‹¤ìŒ ë©”ì‹œì§€ë¥¼ ë°›ê¸° ìœ„í•´ ë‹¤ì‹œ ë¹„ë™ê¸° ìˆ˜ì‹ ì„ ìš”ì²­í•©ë‹ˆë‹¤.
+            // ì´ê²ƒì´ ë¹„ë™ê¸° ëª¨ë¸ì˜ í•µì‹¬ìž…ë‹ˆë‹¤. í•˜ë‚˜ì˜ ìž‘ì—…ì´ ëë‚˜ë©´ ë‹¤ìŒ ìž‘ì—…ì„ ë°”ë¡œ ë‹¤ì‹œê²ë‹ˆë‹¤.
             receive(ptr);
         }
     }
     return 0;
 }
 
-// ÀÚ½ÅÀ» Á¦¿ÜÇÑ ¸ðµç Å¬¶óÀÌ¾ðÆ®¿¡°Ô ¸Þ½ÃÁö¸¦ Àü¼ÛÇÏ´Â ÇÔ¼ö
+// ìžì‹ ì„ ì œì™¸í•œ ëª¨ë“  í´ë¼ì´ì–¸íŠ¸ì—ê²Œ ë©”ì‹œì§€ë¥¼ ì „ì†¡í•˜ëŠ” í•¨ìˆ˜
 void broadcast(SOCKETINFO* sender, const char* msg, int len) {
-    lock_guard<mutex> lock(clients_mutex); // clients º¤ÅÍ º¸È£
+    lock_guard<mutex> lock(clients_mutex); // clients ë²¡í„° ë³´í˜¸
     for (auto client : clients) {
-        if (client->sock == sender->sock) continue; // ¸Þ½ÃÁö¸¦ º¸³½ Å¬¶óÀÌ¾ðÆ®´Â Á¦¿Ü
+        if (client->sock == sender->sock) continue; // ë©”ì‹œì§€ë¥¼ ë³´ë‚¸ í´ë¼ì´ì–¸íŠ¸ëŠ” ì œì™¸
 
-        // °¢ Å¬¶óÀÌ¾ðÆ®ÀÇ ¼Û½Å Å¥¿¡ ¸Þ½ÃÁö¸¦ Ãß°¡ÇÕ´Ï´Ù.
+        // ê° í´ë¼ì´ì–¸íŠ¸ì˜ ì†¡ì‹  íì— ë©”ì‹œì§€ë¥¼ ì¶”ê°€í•©ë‹ˆë‹¤.
         string message(msg, len);
         client->sendQueue.push(message);
 
-        // ¸¸¾à ÇØ´ç Å¬¶óÀÌ¾ðÆ®°¡ ÇöÀç ´Ù¸¥ ¸Þ½ÃÁö¸¦ º¸³»°í ÀÖÁö ¾Ê´Ù¸é,
-        // Áï½Ã ¼Û½Å ÀÛ¾÷À» ½ÃÀÛÇÕ´Ï´Ù.
+        // ë§Œì•½ í•´ë‹¹ í´ë¼ì´ì–¸íŠ¸ê°€ í˜„ìž¬ ë‹¤ë¥¸ ë©”ì‹œì§€ë¥¼ ë³´ë‚´ê³  ìžˆì§€ ì•Šë‹¤ë©´,
+        // ì¦‰ì‹œ ì†¡ì‹  ìž‘ì—…ì„ ì‹œìž‘í•©ë‹ˆë‹¤.
         if (!client->sending) {
             string next_msg = client->sendQueue.front();
             client->sendQueue.pop();
 
             memcpy(client->buf, next_msg.c_str(), next_msg.size());
-            client->recvbytes = next_msg.size(); // º¸³¾ µ¥ÀÌÅÍ Å©±â
-            client->sendbytes = 0; // º¸³½ µ¥ÀÌÅÍ Å©±â ÃÊ±âÈ­
-            client->sending = true; // ¼Û½Å »óÅÂ·Î ÀüÈ¯
-            send(client); // ºñµ¿±â ¼Û½Å ½ÃÀÛ
+            client->recvbytes = next_msg.size(); // ë³´ë‚¼ ë°ì´í„° í¬ê¸°
+            client->sendbytes = 0; // ë³´ë‚¸ ë°ì´í„° í¬ê¸° ì´ˆê¸°í™”
+            client->sending = true; // ì†¡ì‹  ìƒíƒœë¡œ ì „í™˜
+            send(client); // ë¹„ë™ê¸° ì†¡ì‹  ì‹œìž‘
         }
-        // ¸¸¾à 'sending'ÀÌ true¶ó¸é, ÇöÀç ÁøÇà ÁßÀÎ ¼Û½ÅÀÌ ³¡³­ ÈÄ WorkerThread°¡ Å¥¿¡¼­ ´ÙÀ½ ¸Þ½ÃÁö¸¦ ²¨³» º¸³¾ °ÍÀÔ´Ï´Ù.
+        // ë§Œì•½ 'sending'ì´ trueë¼ë©´, í˜„ìž¬ ì§„í–‰ ì¤‘ì¸ ì†¡ì‹ ì´ ëë‚œ í›„ WorkerThreadê°€ íì—ì„œ ë‹¤ìŒ ë©”ì‹œì§€ë¥¼ êº¼ë‚´ ë³´ë‚¼ ê²ƒìž…ë‹ˆë‹¤.
     }
 }
 
-// Å¬¶óÀÌ¾ðÆ® ¸ñ·Ï¿¡¼­ Æ¯Á¤ Å¬¶óÀÌ¾ðÆ®¸¦ Á¦°ÅÇÏ´Â ÇÔ¼ö
+// í´ë¼ì´ì–¸íŠ¸ ëª©ë¡ì—ì„œ íŠ¹ì • í´ë¼ì´ì–¸íŠ¸ë¥¼ ì œê±°í•˜ëŠ” í•¨ìˆ˜
 void remove_client(SOCKETINFO* ptr) {
-    lock_guard<mutex> lock(clients_mutex); // clients º¤ÅÍ º¸È£
-    // C++ STLÀÇ erase-remove idiomÀ» »ç¿ëÇÏ¿© Æ¯Á¤ ¿ø¼Ò¸¦ Á¦°ÅÇÕ´Ï´Ù.
+    lock_guard<mutex> lock(clients_mutex); // clients ë²¡í„° ë³´í˜¸
+    // C++ STLì˜ erase-remove idiomì„ ì‚¬ìš©í•˜ì—¬ íŠ¹ì • ì›ì†Œë¥¼ ì œê±°í•©ë‹ˆë‹¤.
     clients.erase(remove(clients.begin(), clients.end(), ptr), clients.end());
 }
 
-// ºñµ¿±â µ¥ÀÌÅÍ ¼Û½Å ÇÔ¼ö (WSASend ·¡ÆÛ)
+// ë¹„ë™ê¸° ë°ì´í„° ì†¡ì‹  í•¨ìˆ˜ (WSASend ëž˜í¼)
 bool send(SOCKETINFO* ptr) {
     ZeroMemory(&ptr->overlapped, sizeof(ptr->overlapped));
-    // º¸³¾ µ¥ÀÌÅÍÀÇ ½ÃÀÛ À§Ä¡¿Í ±æÀÌ¸¦ ¼³Á¤ÇÕ´Ï´Ù. (ºÐÇÒ Àü¼ÛÀ» À§ÇØ)
+    // ë³´ë‚¼ ë°ì´í„°ì˜ ì‹œìž‘ ìœ„ì¹˜ì™€ ê¸¸ì´ë¥¼ ì„¤ì •í•©ë‹ˆë‹¤. (ë¶„í•  ì „ì†¡ì„ ìœ„í•´)
     ptr->wsabuf.buf = ptr->buf + ptr->sendbytes;
     ptr->wsabuf.len = ptr->recvbytes - ptr->sendbytes;
     DWORD sendbytes;
 
     int retval = WSASend(ptr->sock, &ptr->wsabuf, 1, &sendbytes, 0, &ptr->overlapped, NULL);
-    // WSASend È£ÃâÀÌ ½ÇÆÐÇßÁö¸¸, ¿À·ù ÄÚµå°¡ WSA_IO_PENDINGÀÎ °æ¿ì´Â Á¤»óÀÔ´Ï´Ù.
-    // ÀÌ´Â I/O ÀÛ¾÷ÀÌ ¹é±×¶ó¿îµå¿¡¼­ ÁøÇà ÁßÀÓÀ» ÀÇ¹ÌÇÕ´Ï´Ù.
+    // WSASend í˜¸ì¶œì´ ì‹¤íŒ¨í–ˆì§€ë§Œ, ì˜¤ë¥˜ ì½”ë“œê°€ WSA_IO_PENDINGì¸ ê²½ìš°ëŠ” ì •ìƒìž…ë‹ˆë‹¤.
+    // ì´ëŠ” I/O ìž‘ì—…ì´ ë°±ê·¸ë¼ìš´ë“œì—ì„œ ì§„í–‰ ì¤‘ìž„ì„ ì˜ë¯¸í•©ë‹ˆë‹¤.
     if (retval == SOCKET_ERROR && WSAGetLastError() != WSA_IO_PENDING) {
         err_display("WSASend()");
-        return true; // ½ÇÁ¦ ¿À·ù ¹ß»ý
+        return true; // ì‹¤ì œ ì˜¤ë¥˜ ë°œìƒ
     }
     return false;
 }
 
-// ºñµ¿±â µ¥ÀÌÅÍ ¼ö½Å ÇÔ¼ö (WSARecv ·¡ÆÛ)
+// ë¹„ë™ê¸° ë°ì´í„° ìˆ˜ì‹  í•¨ìˆ˜ (WSARecv ëž˜í¼)
 bool receive(SOCKETINFO* ptr) {
     ZeroMemory(&ptr->overlapped, sizeof(ptr->overlapped));
     ptr->wsabuf.buf = ptr->buf;
@@ -290,15 +302,15 @@ bool receive(SOCKETINFO* ptr) {
     DWORD recvbytes, flags = 0;
 
     int retval = WSARecv(ptr->sock, &ptr->wsabuf, 1, &recvbytes, &flags, &ptr->overlapped, NULL);
-    // WSARecv È£ÃâÀÌ ½ÇÆÐÇßÁö¸¸, ¿À·ù ÄÚµå°¡ WSA_IO_PENDINGÀÎ °æ¿ì´Â Á¤»óÀÔ´Ï´Ù.
+    // WSARecv í˜¸ì¶œì´ ì‹¤íŒ¨í–ˆì§€ë§Œ, ì˜¤ë¥˜ ì½”ë“œê°€ WSA_IO_PENDINGì¸ ê²½ìš°ëŠ” ì •ìƒìž…ë‹ˆë‹¤.
     if (retval == SOCKET_ERROR && WSAGetLastError() != WSA_IO_PENDING) {
         err_display("WSARecv()");
-        return true; // ½ÇÁ¦ ¿À·ù ¹ß»ý
+        return true; // ì‹¤ì œ ì˜¤ë¥˜ ë°œìƒ
     }
     return false;
 }
 
-// Ä¡¸íÀûÀÎ ¿À·ù ¹ß»ý ½Ã ¸Þ½ÃÁö ¹Ú½º¸¦ ¶ç¿ì°í ÇÁ·Î±×·¥À» Á¾·áÇÏ´Â ÇÔ¼ö
+// ì¹˜ëª…ì ì¸ ì˜¤ë¥˜ ë°œìƒ ì‹œ ë©”ì‹œì§€ ë°•ìŠ¤ë¥¼ ë„ìš°ê³  í”„ë¡œê·¸ëž¨ì„ ì¢…ë£Œí•˜ëŠ” í•¨ìˆ˜
 void err_quit(char* msg) {
     LPVOID lpMsgBuf;
     FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, WSAGetLastError(),
@@ -308,7 +320,7 @@ void err_quit(char* msg) {
     exit(1);
 }
 
-// ¿À·ù ¹ß»ý ½Ã ÄÜ¼Ö¿¡ ¿À·ù ¸Þ½ÃÁö¸¦ Ãâ·ÂÇÏ´Â ÇÔ¼ö
+// ì˜¤ë¥˜ ë°œìƒ ì‹œ ì½˜ì†”ì— ì˜¤ë¥˜ ë©”ì‹œì§€ë¥¼ ì¶œë ¥í•˜ëŠ” í•¨ìˆ˜
 void err_display(char* msg) {
     LPVOID lpMsgBuf;
     FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, WSAGetLastError(),
