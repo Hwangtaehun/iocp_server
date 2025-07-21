@@ -11,6 +11,7 @@ Server::Server()
 
 Server::~Server()
 {
+    // 10. 윈속 종료
     WSACleanup();
 }
 
@@ -101,10 +102,12 @@ void Server::Run()
 // Worker Thread: IOCP에서 완료된 I/O 작업을 처리하는 스레드
 DWORD WINAPI Server::WorkerThread(LPVOID arg) {
     HANDLE hcp = (HANDLE)arg;         // main 스레드에서 전달받은 IOCP 핸들
+    SOCKADDR_IN clientaddr;           // 클라이언트 IP 주소
     DWORD cbTransferred;              // I/O 작업으로 전송된 바이트 수
     SOCKET client_sock;               // I/O가 완료된 소켓 (Completion Key)
     SOCKETINFO* ptr;                  // I/O가 완료된 소켓의 상세 정보 구조체 (Overlapped 포인터)
-    int retval;
+    int addrlen;                      // 클라이언트 IP 주소 길이
+    int retval;                       // I/O 서버에 GetQueuedCompletionStatus 호출의 반환값
 
     ServerPacket pk = ServerPacket();
 
@@ -113,11 +116,20 @@ DWORD WINAPI Server::WorkerThread(LPVOID arg) {
         // I/O가 완료되면, 해당 작업에 대한 정보(전송된 바이트, CompletionKey, OVERLAPPED 포인터)를 반환합니다.
         retval = GetQueuedCompletionStatus(hcp, &cbTransferred, (PULONG_PTR)&client_sock, (LPOVERLAPPED*)&ptr, INFINITE);
 
+        addrlen = sizeof(clientaddr);
+        getpeername(ptr->sock, (SOCKADDR*)&clientaddr, &addrlen);
+
         // 클라이언트 연결 종료 처리
         if (retval == 0 || cbTransferred == 0) {
             // GetQueuedCompletionStatus가 0을 반환하거나 전송된 바이트가 0이면 클라이언트 연결이 끊어진 것입니다.
             if (ptr != NULL) { // ptr이 NULL인 경우도 있을 수 있으므로 확인
-                err_display("Client Disconnected");
+                //retval이 0이면 I/O 작업이 실패했거나 완료되지 않았음을 나타내므로 오류를 보여줌
+                if(retval == 0){
+                DWORD temp1, temp2;
+				WSAGetOverlappedResult(ptr->sock, &ptr->overlapped, &temp1, FALSE, &temp2);
+				err_display("WSAGetOverlappedResult()"); 
+                }
+                printf("[TCP 서버] 클라이언트 종료: IP 주소=%s, 포트 번호=%d\n", inet_ntoa(clientaddr.sin_addr), ntohs(clientaddr.sin_port));
                 closesocket(ptr->sock);
                 remove_client(ptr); // 클라이언트 목록에서 제거
                 ptr->sock = INVALID_SOCKET; // 재접근 방지
@@ -162,10 +174,6 @@ DWORD WINAPI Server::WorkerThread(LPVOID arg) {
         else { // 수신 작업 완료
             ptr->recvbytes = cbTransferred;
             ptr->buf[cbTransferred] = '\0'; // 문자열 처리를 위해 NULL 종단 추가
-
-            SOCKADDR_IN clientaddr;
-            int addrlen = sizeof(clientaddr);
-            getpeername(ptr->sock, (SOCKADDR*)&clientaddr, &addrlen);
 
             char m_buf[BUFSIZE] = { 0 };
             memcpy(m_buf, ptr->buf, ptr->recvbytes);
